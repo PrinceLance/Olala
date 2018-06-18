@@ -7,6 +7,7 @@ services:
     depends_on:
     - mongo
   mongo:
-    image: mongo
+    image: 'mongo:latest'
+    command: mongod --port 27018
     ports:
-    - "27018:27018"
+        - '27018:27018'
