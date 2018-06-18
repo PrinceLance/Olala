@@ -10,11 +10,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/maps": "latest",
     "body-parser": "latest",
     "express": "latest",
     "mongoose": "latest",
+    "request": "^2.87.0",
     "swagger-ui-express": "latest",
-    "@google/maps":"latest"
+    "request": "latest"
   },
   "devDependencies": {
     "chai": "latest",
