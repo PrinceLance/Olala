@@ -1,0 +1,133 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Swagger for olala",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "host": "localhost:3000",
+  "basePath": "/api/v1",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/route": {
+      "post": {
+        "description": "Submit start point and waypoints",
+        "tags": [
+          "Routes"
+        ],
+        "parameters": [
+          {
+            "name": "route",
+            "in": "body",
+            "description": "starting point and points we want to go through",
+            "schema": {
+              "$ref": "#/definitions/LatLongs"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request Submitted",
+            "schema": {
+              "$ref": "#/definitions/Token"
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/route/{token}": {
+      "get": {
+        "summary": "Find the route with a token",
+        "tags": [
+          "Routes"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "description": "request token",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Record is found",
+            "schema": {
+              "$ref": "#/definitions/Routes"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Error": {
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "LatLong": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 2,
+      "maxItems": 2,
+      "examples": ["22.372081", "114.107877"]
+    },
+    "Token":{
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }   
+    },
+    "LatLongs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/LatLong"
+      }
+    },
+    "Routes": {
+      "properties": {
+        "status": {
+          "type": "string"
+        },"path": {
+         "type": "array",
+         "$ref": "#/definitions/LatLong"
+        },"total_distance": {
+         "type": "integer"
+        },"total_time": {
+          "type": "integer"
+        }
+      }
+    }  
+  }
+}

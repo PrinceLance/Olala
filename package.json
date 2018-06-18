@@ -1,0 +1,24 @@
+{
+  "name": "olala",
+  "version": "1.0.0",
+  "description": "trying out some stuffs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "mocha app/tests/test.js --timeout 10000"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "latest",
+    "express": "latest",
+    "mongoose": "latest",
+    "swagger-ui-express": "latest",
+    "@google/maps":"latest"
+  },
+  "devDependencies": {
+    "chai": "latest",
+    "chai-http": "latest",
+    "mocha": "latest"
+  }
+}
