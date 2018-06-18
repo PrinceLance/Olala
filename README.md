@@ -23,7 +23,7 @@ docker-compose up --build
 npm install
 npm start
 ```
-Note that I set database port to 27018, so you might want to either change my configs codes or set your db to listen to port 27018
+Note that I set database port to 27018, so if you want to use different ports, you might want to either change my configs codes.
 
 
 # Use
