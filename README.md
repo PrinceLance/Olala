@@ -1,5 +1,5 @@
 # Olala
-just trying some stuffs in node js, this is a api server that help you to find driving directios.
+just trying some stuffs in node js, this is an API server that help you to find driving directios.
 
 
 # Disclaimer
@@ -12,13 +12,13 @@ Since I am a docker/node noob, I cant really tell you how to solve this or that 
 I am using CentOS7 (inside virtual machine)
 
 
- Install
+# Installation
 ## Docker / Docker compose way
 ```
 docker-compose up --build  
 ```
 
-## normal installation (guaranteed to run? maybe)
+## Normal installation (guaranteed to run? maybe)
 ```
 npm install
 npm start
@@ -42,7 +42,7 @@ Say... for some reason you want to make the app to be able to handle millions of
 3. If you want to use docker to deploy, rename docker-compose-scale.yml to docker-compose.yml.
 4. change the config file so the database url points to the database you set in step 1.
 5. get as many server as you can, then deploy the code in them.
-6. create a load balancer, simply use expressjs that have all the list of the servers in step 5, then redirect the request to them. (first request go to server 1, second one go to server 2.. and so on).
+6. create a load balancer, simply use expressjs that have all the list of the servers in step 5, then spread the load to them. (first request go to server 1, second one go to server 2.. and so on).
 7. the url of the "service" is the entry point of the load balancer.
 8. in the not so long future, when you need to handle billions of user, simply add more server and do step 5, then add the server url to the load balancer list.
 9. enjoy.
@@ -134,7 +134,7 @@ curl -X GET "http://localhost:3000/api/v1/route/5b27934a39c545000f4b1f2a" -H  "a
 # Next Version...Maybe
 Load Balancer implementation. 
 
-#FAQ
+#  FAQ
 1. What is "Olala"  
 A. Obviously you are not French, are you? In the words of Abraham Lincoln:
 > Pardon my French
@@ -144,4 +144,7 @@ A. Then it won't be difficult enough for me.
 
 3. Since you come from PHP background, why not use it?  
 A. So I can't try new stuffs because I am from PHP backgrounds?  
+
+4. Why no code for the load balancer?  
+A. In future release, and I guess you dont need to serve millions of user now, right?  
 
