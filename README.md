@@ -151,3 +151,5 @@ A. In future release, and I guess you dont need to serve millions of user now, r
 5. Why swagger, your app looks simple?  
 A. It won't when more functions is added, plus, swagger is helpful in testing too.  
 
+6. You didn't answer my question!!!    
+A. shoot me an email, lancecheung000 at gmail dot com
