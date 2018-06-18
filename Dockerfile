@@ -1,8 +1,11 @@
 FROM node:latest
-RUN mkdir -p /usr/src/app
+# Create app directory
 WORKDIR /usr/src/app
-COPY package.json /usr/src/app/
+# Install app dependencies
+COPY package*.json ./
 RUN npm install
-COPY . /usr/src/app
+# Copy app source code
+COPY . .
+#Expose port and start application
 EXPOSE 3000
-CMD [ “npm”, “start” ]
+CMD [ "npm", "start" ]
