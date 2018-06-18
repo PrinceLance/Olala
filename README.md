@@ -4,7 +4,7 @@ just trying some stuffs in node js, this is an API server that help you to find 
 
 # Disclaimer
 I am super beginner on docker / promises so don't be that hard on me :) 
-This project is to try some new stuffs by building API in nodejs (I come from PHP background) 
+This project is to try some new stuffs by building API in nodejs (I come from PHP/Python background) 
 
 
 # Prerequisite
@@ -147,4 +147,7 @@ A. So I can't try new stuffs because I am from PHP backgrounds?
 
 4. Why no code for the load balancer?  
 A. In future release, and I guess you dont need to serve millions of user now, right?  
+
+5. Why swagger, your app looks simple?  
+A. It won't when more functions is added, plus, swagger is helpful in testing too.  
 
