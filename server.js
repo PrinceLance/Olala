@@ -29,8 +29,6 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // parse application/json
 app.use(bodyParser.json())
 
-
-console.log(dbConfig.url);
 mongoose.Promise = global.Promise;
 // Connecting to the database
 mongoose.connect(dbConfig.url)

@@ -12,12 +12,12 @@ I am using CentOS7 (inside virtual machine)
 
 # Install
 ## Docker / Docker compose way
-docker build -t edbert/olala .
-docker-compose up
+docker-compose up --build
 
 ## normal installation (guaranted to run? maybe)
 
 
+http://0.0.0.0:3000/api-docs/
 
 # Features
 Scalability 
@@ -34,12 +34,14 @@ docker do behind the scenes, and I haven't tried to shard mongodb, I'll put this
 
 
 #FAQ
-1. What is "Olala"
-A. Obviously you are not French, are you?
+1. What is "Olala"  
+A. Obviously you are not French, are you?  
+In the words of Abraham Lincoln:
+> Pardon my French
 
-2. Why the hassle, just dont use docker
-A. Then it won't be difficult enought for me.
+2. Why the hassle, just dont use docker  
+A. Then it won't be difficult enought for me.  
 
-3. Since you come from PHP background, why not use it?
-A. So I can't try new stuffs because I am from PHP backgrounds?
+3. Since you come from PHP background, why not use it?  
+A. So I can't try new stuffs because I am from PHP backgrounds?  
 
