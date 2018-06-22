@@ -174,7 +174,7 @@ exports.getRoute = (req, res) => {
 				{
 					// add error message for each path which failed
 					if(paths[i].status == "failure")
-						error += paths[i].err_msg
+						error += " " + paths[i].err_msg
 					else{
 						// overwrite when the status is failure (no success path yet)
 						// or when the distance of current path is better
