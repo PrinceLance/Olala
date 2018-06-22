@@ -1,5 +1,5 @@
 # Olala
-just trying some stuffs in node js, this is an API server that help you to find driving directios.
+just trying some stuffs in node js, this is an API server that help you to find driving directions.
 
 
 # Disclaimer
@@ -52,13 +52,16 @@ Say... for some reason you want to make the app to be able to handle millions of
 Method: POST  
 URL path: /api/v1/route  
  
-Accept a set of waypoints in form of array of LatLong pairs from user input, that refer to the points you are driving through.  
-Sample input: must have 2 or more points. In below case, this is request for directions from UBC business school to Surrey Central Station, via CD Richmond Center
+Accept a set of waypoints in form of array of LatLong pairs from user input, that refer to the points you are going to drive through.  
+The system will return the shortest path starting from the first place you specified, and going through all the waypoints  
+Sample input: must have 2 or more points. In below case, this is request for directions starting from UBC business school
+and the user want to go through both Surrey Central Station and CD Richmond Center
 ```
 [
 	["49.264930", "-123.253188"],
-	["49.166630", "-123.137884"],
-	["49.189023", "-122.849819"]
+	["49.189023", "-122.849819"],
+	["49.166630", "-123.137884"]
+	
 ]
 ```
 
@@ -89,25 +92,15 @@ sample input:  the token
 
 Some Sample outputs
 ```
-{  
-  "status": "success",  
-  "path": [  
-    [  
-      "49.2649112",  
-      "-123.2542205"  
-    ],  
-	... // a lot of waypoints
-    [  
-      "49.1860713",  
-      "-122.8519724"  
-    ],  
-    [  
-      "49.1890226",  
-      "-122.8498091"  
-    ]  
-  ],  
-  "total_distance": 48870,  
-  "total_time": 3763  
+{
+  "status": "success",
+  "path": [
+    ["49.264930","-123.253188"],
+    ["49.166630","-123.137884"],
+    ["49.189023","-122.849819"]
+  ],
+  "total_distance": 48870,
+  "total_time": 3763
 }
 ```
 
