@@ -1,4 +1,5 @@
-const Route = require('../models/model.js');
+const Route = require('../models/queryModel.js');
+const Path = require('../models/pathModel.js');
 
 // Submit start point and waypoints
 exports.submitRoute = (req, res) => {
@@ -15,15 +16,10 @@ exports.submitRoute = (req, res) => {
 			message: "The waypoints are less than 2, You are trolling, aren't you?"
 		});
 	}
-
+	
 	// Create a Route
 	const newRoute = new Route({
-		"status": "in progress",
-		"originPath" : req.body,
-		"path": [],
-		"total_distance": 0,
-		"total_time": 0,
-		"err_msg": "in progress"
+		originPath : req.body
 	});	
 	
 	// save the in progess
@@ -36,67 +32,103 @@ exports.submitRoute = (req, res) => {
 		this._id = data._id;
 		var waypoints = data.originPath;
 
-		// params to pass to google directions api
-		var googleAPIParams = {
-			mode:"driving",
-			origin:waypoints[0],
-			destination:waypoints[waypoints.length-1],
-			waypoints:[] 
-		};
-
-		for (var i=1; i<waypoints.length-1; i++){
-			googleAPIParams.waypoints.push(waypoints[i]);
-		}		
-
 		// init gmap client
 		googleMapsClient = require('@google/maps').createClient({
 			key: require('../../app/configs/googleAPIkey.js').key,   // HEYYY dont copy, gonna disable this soon
 			Promise: Promise
 		});		
-		
-		// call gmap API
-		googleMapsClient.directions(googleAPIParams)
-		.asPromise()
-		.then((response) => {
+			
+		for(var x = 0; x< waypoints.length-1; x++){
 
-			if(response.json.status == "OK")
-			{
-				var path = [];
-				var distance = 0;
-				var duration = 0;
+			// iterate the waypoints (except starting point) and set each of them as destination
 
-				// starting point
-				path.push([response.json.routes[0].legs[0].start_location.lat , response.json.routes[0].legs[0].start_location.lng]);
-				var legs = response.json.routes[0].legs
+			// deep copy
+			var tempWayP = JSON.parse(JSON.stringify(waypoints));
+			
+			// the destination
+			var destina = waypoints[waypoints.length-1-x];
 
-			  	for (var i=0; i<legs.length; i++){
-			  		var steps = legs[i].steps;
-					distance += legs[i].distance.value;
-					duration += legs[i].duration.value;	  			
+			//remove the "destination"
+			tempWayP.splice(waypoints.length-1-x, 1);
 
-					for (var j=0; j<steps.length; j++){
-			    	    path.push([steps[j].end_location.lat, steps[j].end_location.lng]);
-			    	}
+			// remove the "starting point"
+			tempWayP.splice(0, 1);
+
+			// by this line tempWayP is basically the original waypoints minus the starting point and destination
+			// params to pass to google directions api
+			var googleAPIParams = {
+				mode:"driving",
+				optimize:true,
+				origin:waypoints[0],
+				destination:destina,
+				waypoints:tempWayP 
+			};
+
+			// call gmap API
+			googleMapsClient.directions(googleAPIParams)
+			.asPromise()
+			.then((response) => {
+
+				if(response.json.status == "OK")
+				{
+					var path = [];
+					var distance = 0;
+					var duration = 0;
+
+					// get the waypoint_order
+					var order = response.json.routes[0].waypoint_order;
+					var waypoints = response.query.waypoints.split("|"); // get the waypoints and split them, note that key 0 is not a wp
+
+					// get the driving order for this route (which is the shortest for this route)
+					path.push(response.query.origin.split(",")); // start
+					for (var i=0; i<order.length; i++){
+						path.push(waypoints[order[i]+1].split(",")); // whatever
+					}
+					path.push(response.query.destination.split(",")); // destination
+
+					// calculate distance and duration of this route
+					var legs = response.json.routes[0].legs
+				  	for (var i=0; i<legs.length; i++){
+						distance += legs[i].distance.value;
+						duration += legs[i].duration.value;	  			
+					}
+
+					// insert into path
+					Path.create({
+						token:  this._id,
+						status: 'success',
+						path:path,
+						total_distance: distance,
+						total_time: duration,
+						err_msg: "success"
+					});
 				}
+				else
+				{
 
-				Route.update({ _id: this._id }, { $set: { status: 'success', "err_msg": "success", path:path, "total_distance": distance, "total_time": duration}}, function(){;});
-			}
-			else
-			{
+					var errorMsg = response.json.status;
+					if("error_message" in response)
+						errorMsg += " " + response.json.error_message;
 
-				var errorMsg = response.json.status;
-				if("error_message" in response)
-					errorMsg += " " + response.json.error_message;
-
-				Route.update({ _id: this._id }, { $set: { status: 'failure', "err_msg": errorMsg}}, function(){;});
-
-				//To update: why I cant throw error / promise reject here?
-			}
-		});
+					// still... insert into path even when there's error
+					Path.create({
+						token:  this._id,
+						status: 'failure',
+						err_msg: errorMsg
+					});
+				}
+			});
+		}
 		
 	}).catch(function(err){
-		if("_id" in this)
-			Route.update({ _id: this._id }, { $set: { status: 'failure', "err_msg": err}}, function(){;});
+		if("_id" in this){
+			Route.findById(this._id, function (error, doc){
+				if(error)
+					console.log ("Database Error: Problem Finding Record in DB to write failure message :" + error);
+				else if(doc.status != 'success') // update only when current record is not successful
+					Path.create({token:  this._id, status: 'failure', err_msg: err});
+			});
+		}
 		else
 			console.log ("Database Error: Problem with adding a new record to DB Error Details :" + err);
 	});
@@ -116,22 +148,62 @@ exports.getRoute = (req, res) => {
             });            
         }
 
-		var respObj = {};
-		if(route.status  == "in progress"){
-			respObj.status = route.status;
+		Path.find({ token: route.id})
+		.then(paths =>{
+			
+			var respObj = {}; // init response obj
+			//console.log(paths);
 
-		}else if(route.status  == "failure"){
-			respObj.status = route.status;
-			respObj.error = route.err_msg;
+			// first, we get the number of possible paths (original path length -1)
+			var noOfPath = route.originPath.length-1;
 
-		}else if(route.status  == "success"){
-			respObj.status = route.status;
-			respObj.path = route.path;
-			respObj.total_distance = route.total_distance;
-			respObj.total_time = route.total_time;
-		}
+			// if the number of paths in the DB is lower than the number of possible path
+			// then we can see that some of the google api calls haven't been finished
+			if(paths.length < noOfPath)
+				respObj.status = "in progress";
+			else{
 
-		res.send(respObj);
+				var status = "failure"; // hehehe
+				var path = []; // hehehe
+				var total_distance = 0; // hehehe
+				var total_time = 0; // hehehe
+				var error = ""; // hehehe
+
+				// iterate the paths data to find out which one is the best
+				for(var i = 0; i < noOfPath; i++)
+				{
+					// add error message for each path which failed
+					if(paths[i].status == "failure")
+						error += paths[i].err_msg
+					else{
+						// overwrite when the status is failure (no success path yet)
+						// or when the distance of current path is better
+						if((status == "failure") || paths[i].total_distance < total_distance)
+						{
+							status = paths[i].status;
+							path = paths[i].path;
+							total_distance = paths[i].total_distance;
+							total_time = paths[i].total_time;						
+						}
+					}
+				}
+
+				// when no path result in success
+				if(status == "failure") {
+					respObj.status = status;
+					respObj.error = error;
+				}
+				else{  // when at least one path is successful
+					respObj.status = status;
+					respObj.path = path;
+					respObj.total_distance = total_distance;
+					respObj.total_time = total_time;
+				}
+
+			}
+			res.send(respObj); // send result
+		});
+
     }).catch(err => {
         if(err.kind === 'ObjectId') {
             return res.status(400).send({
